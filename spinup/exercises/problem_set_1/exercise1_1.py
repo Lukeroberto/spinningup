@@ -5,10 +5,10 @@ import numpy as np
 
 Exercise 1.1: Diagonal Gaussian Likelihood
 
-Write a function which takes in Tensorflow symbols for the means and 
-log stds of a batch of diagonal Gaussian distributions, along with a 
-Tensorflow placeholder for (previously-generated) samples from those 
-distributions, and returns a Tensorflow symbol for computing the log 
+Write a function which takes in Tensorflow symbols for the means and
+log stds of a batch of diagonal Gaussian distributions, along with a
+Tensorflow placeholder for (previously-generated) samples from those
+distributions, and returns a Tensorflow symbol for computing the log
 likelihoods of those samples.
 
 """
@@ -23,12 +23,15 @@ def gaussian_likelihood(x, mu, log_std):
     Returns:
         Tensor with shape [batch]
     """
-    #######################
-    #                     #
-    #   YOUR CODE HERE    #
-    #                     #
-    #######################
-    return tf.constant(0)
+    EPSILON = 1e-8
+
+    # There are 3 terms in this likelihood
+    t1 = np.log(2*np.pi)
+    t2 = 2 * log_std
+    t3 = ((x - mu) / (tf.exp(log_std) + EPSILON)) ** 2
+
+    pre_sum = - 0.5 * (t1 + t2 + t3)
+    return tf.reduce_sum(pre_sum, axis=1)
 
 
 if __name__ == '__main__':

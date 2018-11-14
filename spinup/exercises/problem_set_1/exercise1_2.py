@@ -6,7 +6,7 @@ from spinup.exercises.problem_set_1 import exercise1_1
 
 Exercise 1.2: PPO Gaussian Policy
 
-Implement an MLP diagonal Gaussian policy for PPO. 
+Implement an MLP diagonal Gaussian policy for PPO.
 
 Log-likelihoods will be computed using your answer to Exercise 1.1,
 so make sure to complete that exercise before beginning this one.
@@ -33,12 +33,11 @@ def mlp(x, hidden_sizes=(32,), activation=tf.tanh, output_activation=None):
         A TF symbol for the output of an MLP that takes x as an input.
 
     """
-    #######################
-    #                     #
-    #   YOUR CODE HERE    #
-    #                     #
-    #######################
-    pass
+    hidden_layer = x
+    for h in hidden_sizes[:-1]:
+        hidden_layer = tf.layers.dense(hidden_layer, units=h, activation=activation)
+
+    return tf.layers.dense(hidden_layer, units=hidden_sizes[-1], activation=output_activation)
 
 def mlp_gaussian_policy(x, a, hidden_sizes, activation, output_activation, action_space):
     """
@@ -62,27 +61,25 @@ def mlp_gaussian_policy(x, a, hidden_sizes, activation, output_activation, actio
             environment this agent will interact with.
 
     Returns:
-        pi: A symbol for sampling stochastic actions from a Gaussian 
+        pi: A symbol for sampling stochastic actions from a Gaussian
             distribution.
 
-        logp: A symbol for computing log-likelihoods of actions from a Gaussian 
+        logp: A symbol for computing log-likelihoods of actions from a Gaussian
             distribution.
 
-        logp_pi: A symbol for computing log-likelihoods of actions in pi from a 
+        logp_pi: A symbol for computing log-likelihoods of actions in pi from a
             Gaussian distribution.
 
     """
-    #######################
-    #                     #
-    #   YOUR CODE HERE    #
-    #                     #
-    #######################
-    # mu = 
-    # log_std = 
-    # pi = 
+    act_dim = a.shape.as_list()[-1]
+    mu = mlp(x, list(hidden_sizes)+[act_dim], activation, output_activation)
+    log_std = tf.get_variable(name='log_std', initializer=-0.5*np.ones(act_dim, dtype=np.float32))
+    std = tf.exp(log_std)
+    pi = mu + tf.random_normal(tf.shape(mu)) * std
 
     logp = exercise1_1.gaussian_likelihood(a, mu, log_std)
     logp_pi = exercise1_1.gaussian_likelihood(pi, mu, log_std)
+
     return pi, logp, logp_pi
 
 
